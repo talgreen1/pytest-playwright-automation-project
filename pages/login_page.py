@@ -1,7 +1,7 @@
 from playwright.sync_api import Page
+from .config import URL
 
 class LoginPage:
-    URL = "https://www.saucedemo.com/v1/"
     USERNAME_INPUT = "#user-name"
     PASSWORD_INPUT = "#password"
     LOGIN_BUTTON = "#login-button"
@@ -11,7 +11,7 @@ class LoginPage:
         self.page = page
 
     def load(self):
-        self.page.goto(self.URL)
+        self.page.goto(URL)
 
     def login(self, username: str, password: str):
         self.page.fill(self.USERNAME_INPUT, username)
