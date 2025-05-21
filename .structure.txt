@@ -1,0 +1,11 @@
+# Directory structure for Page Object Model and tests
+
+pages/
+    __init__.py
+    login_page.py
+
+conftest.py
+
+tests/
+    __init__.py
+    test_login.py
