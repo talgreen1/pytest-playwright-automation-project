@@ -4,17 +4,27 @@ import os
 from pages.config import URL
 from test_settings import HEADLESS, TIMEOUT, SLOWMO
 
-# Use HEADLESS and SLOWMO from test_settings.py as default
+def get_cli_options(request):
+    """Return CLI options for headless and slowmo as a dict."""
+    headless_cli = request.config.getoption('--headless')
+    slowmo_cli = request.config.getoption('--slowmo')
+    return {
+        'headless': headless_cli,
+        'slowmo': slowmo_cli
+    }
 
-def get_headless_option():
+def get_headless_option(cli_options):
     # Priority: pytest CLI > env var > test_settings.py default
+    headless_cli = cli_options['headless']
+    if headless_cli is not None:
+        return headless_cli.lower() in ['1', 'true', 'yes']
     headless_env = os.getenv('HEADLESS')
     if headless_env is not None:
         return headless_env.lower() in ['1', 'true', 'yes']
     return HEADLESS
 
-def get_slowmo_option(request):
-    slowmo_cli = request.config.getoption('--slowmo')
+def get_slowmo_option(cli_options):
+    slowmo_cli = cli_options['slowmo']
     if slowmo_cli is not None:
         try:
             return int(slowmo_cli)
@@ -28,6 +38,8 @@ def get_slowmo_option(request):
             pass
     return SLOWMO
 
+# Use HEADLESS and SLOWMO from test_settings.py as default
+
 def pytest_addoption(parser):
     parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
     parser.addoption('--slowmo', action='store', default=None, help='Slow down Playwright operations by the specified ms')
@@ -40,12 +52,9 @@ def playwright_instance():
 
 @pytest.fixture(scope="function")
 def browser(playwright_instance, request):
-    headless_cli = request.config.getoption('--headless')
-    if headless_cli is not None:
-        headless = headless_cli.lower() in ['1', 'true', 'yes']
-    else:
-        headless = get_headless_option()
-    slowmo = get_slowmo_option(request)
+    cli_options = get_cli_options(request)
+    headless = get_headless_option(cli_options)
+    slowmo = get_slowmo_option(cli_options)
     browser = playwright_instance.chromium.launch(headless=headless, slow_mo=slowmo)
     yield browser
     browser.close()
