@@ -2,6 +2,26 @@
 
 # Pytest + Playwright + Allure Example
 
+## Prerequisites
+
+1. Install Python 3.8+ and pip if not already installed.
+2. Install project dependencies:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+3. Install Allure CLI:
+   - **Windows (using Scoop):**
+     ```powershell
+     Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+     irm get.scoop.sh | iex
+     scoop install allure
+     ```
+   - **macOS (using Homebrew):**
+     ```bash
+     brew install allure
+     ```
+   - For other OS or manual installation, see https://docs.qameta.io/allure/ for instructions.
+
 ## How to run tests
 
 1. (Optional) Activate your virtual environment:
