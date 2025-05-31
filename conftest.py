@@ -3,6 +3,7 @@ from playwright.sync_api import sync_playwright
 import os
 from pages.config import URL
 from test_settings import HEADLESS, TIMEOUT, SLOWMO
+import glob
 
 def get_cli_options(request):
     """Return CLI options for headless and slowmo as a dict."""
@@ -65,3 +66,13 @@ def page(browser):
     page = context.new_page()
     yield page
     context.close()
+
+def pytest_sessionstart(session):
+    """Delete all JSON files in allure-results before test session starts."""
+    results_dir = os.path.join(os.path.dirname(__file__), '../allure-results')
+    json_files = glob.glob(os.path.join(results_dir, '*.json'))
+    for f in json_files:
+        try:
+            os.remove(f)
+        except Exception as e:
+            print(f"Could not delete {f}: {e}")
