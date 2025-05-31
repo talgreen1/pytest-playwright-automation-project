@@ -52,26 +52,28 @@ def attach_request_response_to_allure(response, request_info=None):
 @allure.title("Verify airport count is 30")
 @allure.description("Checks that the /airports endpoint returns exactly 30 airports.")
 def test_airport_count(airports_response):
-    with allure.step("Request airport list"):
+    with allure.step("Request airport list from /airports endpoint"):
         response = airports_response
         attach_request_response_to_allure(response)
-    data = response.json()
-    airports = data.get("data", [])
-    assert len(airports) == 30, f"Expected 30 airports, got {len(airports)}"
+    with allure.step("Parse response and validate airport count"):
+        data = response.json()
+        airports = data.get("data", [])
+        assert len(airports) == 30, f"Expected 30 airports, got {len(airports)}"
 
 @allure.feature("Airport API")
 @allure.story("Airport List")
 @allure.title("Verify specific airports are present")
 @allure.description("Checks that certain known airports are present in the /airports endpoint response.")
 def test_airport_includes_specific(airports_response):
-    with allure.step("Request airport list"):
+    with allure.step("Request airport list from /airports endpoint"):
         response = airports_response
         attach_request_response_to_allure(response)
-    data = response.json()
-    airports = data.get("data", [])
-    airport_names = [airport["attributes"]["name"] for airport in airports]
-    for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
-        assert name in airport_names, f"{name} not found in airport list"
+    with allure.step("Parse response and check for specific airports"):
+        data = response.json()
+        airports = data.get("data", [])
+        airport_names = [airport["attributes"]["name"] for airport in airports]
+        for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
+            assert name in airport_names, f"{name} not found in airport list"
 
 @allure.feature("Airport API")
 @allure.story("Airport Distance")
@@ -89,14 +91,15 @@ def test_airport_includes_specific(airports_response):
 )
 def test_distance_between_airports(from_code, to_code, min_distance):
     payload = {"from": from_code, "to": to_code}
-    with allure.step(f"Request distance between {from_code} and {to_code}"):
+    with allure.step(f"Request distance between {from_code} and {to_code} from /airports/distance endpoint"):
         response = requests.post(f"{API_BASE}/airports/distance", json=payload)
         attach_request_response_to_allure(
             response,
             request_info=f"POST {response.request.url}\nPayload: {payload}"
         )
-    assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
-    data = response.json()
-    distance_km = data.get("data", {}).get("attributes", {}).get("kilometers")
-    assert distance_km is not None, "Distance in kilometers not found in response."
-    assert distance_km > min_distance, f"Expected distance > {min_distance} km, got {distance_km} km"
+    with allure.step("Parse response and validate distance"):
+        assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
+        data = response.json()
+        distance_km = data.get("data", {}).get("attributes", {}).get("kilometers")
+        assert distance_km is not None, "Distance in kilometers not found in response."
+        assert distance_km > min_distance, f"Expected distance > {min_distance} km, got {distance_km} km"
