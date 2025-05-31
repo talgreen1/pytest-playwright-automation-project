@@ -62,18 +62,22 @@ def test_airport_count(airports_response):
 
 @allure.feature("Airport API")
 @allure.story("Airport List")
-@allure.title("Verify specific airports are present")
-@allure.description("Checks that certain known airports are present in the /airports endpoint response.")
-def test_airport_includes_specific(airports_response):
+@allure.title("Verify specific airport is present")
+@allure.description("Checks that a known airport is present in the /airports endpoint response.")
+@pytest.mark.parametrize("airport_name", [
+    "Akureyri Airport",
+    "St. Anthony Airport",
+    "CFB Bagotville"
+])
+def test_airport_includes_specific(airports_response, airport_name):
     with allure.step("Request airport list from /airports endpoint"):
         response = airports_response
         attach_request_response_to_allure(response)
-    with allure.step("Parse response and check for specific airports"):
+    with allure.step(f"Parse response and check for airport: {airport_name}"):
         data = response.json()
         airports = data.get("data", [])
         airport_names = [airport["attributes"]["name"] for airport in airports]
-        for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
-            assert name in airport_names, f"{name} not found in airport list"
+        assert airport_name in airport_names, f"{airport_name} not found in airport list"
 
 @allure.feature("Airport API")
 @allure.story("Airport Distance")
