@@ -1,5 +1,6 @@
 import requests
 import pytest
+import allure
 
 API_BASE = "https://airportgap.com/api"
 
@@ -16,11 +17,19 @@ def airports_response():
     assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
     return response
 
+@allure.feature("Airport API")
+@allure.story("Airport List")
+@allure.title("Verify airport count is 30")
+@allure.description("Checks that the /airports endpoint returns exactly 30 airports.")
 def test_airport_count(airports_response):
     data = airports_response.json()
     airports = data.get("data", [])
     assert len(airports) == 30, f"Expected 30 airports, got {len(airports)}"
 
+@allure.feature("Airport API")
+@allure.story("Airport List")
+@allure.title("Verify specific airports are present")
+@allure.description("Checks that certain known airports are present in the /airports endpoint response.")
 def test_airport_includes_specific(airports_response):
     data = airports_response.json()
     airports = data.get("data", [])
@@ -28,6 +37,10 @@ def test_airport_includes_specific(airports_response):
     for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
         assert name in airport_names, f"{name} not found in airport list"
 
+@allure.feature("Airport API")
+@allure.story("Airport Distance")
+@allure.title("Verify distance between airports is above minimum")
+@allure.description("Checks that the calculated distance between two airports is greater than the specified minimum value.")
 @pytest.mark.parametrize(
     "from_code,to_code,min_distance",
     [
