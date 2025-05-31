@@ -6,7 +6,7 @@ from pages.config import USERNAME, PASSWORD
 @allure.feature("Login")
 @allure.story("Valid Login")
 @allure.title("Successful login with valid credentials")
-@allure.description("This test verifies that a user can log in with valid credentials and see the Products page.")
+@allure.description("Ensures that logging in with valid credentials displays the Products page and exactly 6 product listings.")
 def test_login_success(page):
     with allure.step("Start login test"):  # Top-level test step
         login_page = LoginPage(page)
