@@ -22,7 +22,24 @@ def airports_response():
 @allure.title("Verify airport count is 30")
 @allure.description("Checks that the /airports endpoint returns exactly 30 airports.")
 def test_airport_count(airports_response):
-    data = airports_response.json()
+    with allure.step("Request airport list"):
+        response = airports_response
+        allure.attach(
+            str(response.request.url),
+            name="Request URL",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            str(response.status_code),
+            name="Response Status Code",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            response.text,
+            name="Response Body",
+            attachment_type=allure.attachment_type.JSON
+        )
+    data = response.json()
     airports = data.get("data", [])
     assert len(airports) == 30, f"Expected 30 airports, got {len(airports)}"
 
@@ -31,7 +48,24 @@ def test_airport_count(airports_response):
 @allure.title("Verify specific airports are present")
 @allure.description("Checks that certain known airports are present in the /airports endpoint response.")
 def test_airport_includes_specific(airports_response):
-    data = airports_response.json()
+    with allure.step("Request airport list"):
+        response = airports_response
+        allure.attach(
+            str(response.request.url),
+            name="Request URL",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            str(response.status_code),
+            name="Response Status Code",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            response.text,
+            name="Response Body",
+            attachment_type=allure.attachment_type.JSON
+        )
+    data = response.json()
     airports = data.get("data", [])
     airport_names = [airport["attributes"]["name"] for airport in airports]
     for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
@@ -53,7 +87,23 @@ def test_airport_includes_specific(airports_response):
 )
 def test_distance_between_airports(from_code, to_code, min_distance):
     payload = {"from": from_code, "to": to_code}
-    response = requests.post(f"{API_BASE}/airports/distance", json=payload)
+    with allure.step(f"Request distance between {from_code} and {to_code}"):
+        response = requests.post(f"{API_BASE}/airports/distance", json=payload)
+        allure.attach(
+            f"POST {response.request.url}\nPayload: {payload}",
+            name="Request",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            str(response.status_code),
+            name="Response Status Code",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(
+            response.text,
+            name="Response Body",
+            attachment_type=allure.attachment_type.JSON
+        )
     assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
     data = response.json()
     distance_km = data.get("data", {}).get("attributes", {}).get("kilometers")
