@@ -3,17 +3,26 @@ import pytest
 
 API_BASE = "https://airportgap.com/api"
 
-def test_airport_count():
+@pytest.fixture
+def airports_response():
+    """
+    Pytest fixture that sends a GET request to the '/airports' endpoint of the API.
+    Asserts that the response status code is 200 (OK) and returns the response object.
+
+    Returns:
+        requests.Response: The response object from the GET request to the airports endpoint.
+    """
     response = requests.get(f"{API_BASE}/airports")
     assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
-    data = response.json()
+    return response
+
+def test_airport_count(airports_response):
+    data = airports_response.json()
     airports = data.get("data", [])
     assert len(airports) == 30, f"Expected 30 airports, got {len(airports)}"
 
-def test_airport_includes_specific():
-    response = requests.get(f"{API_BASE}/airports")
-    assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
-    data = response.json()
+def test_airport_includes_specific(airports_response):
+    data = airports_response.json()
     airports = data.get("data", [])
     airport_names = [airport["attributes"]["name"] for airport in airports]
     for name in ["Akureyri Airport", "St. Anthony Airport", "CFB Bagotville"]:
