@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import sync_playwright
 import os
-from pages.config import URL
+from config import URL
 from test_settings import HEADLESS, TIMEOUT, SLOWMO
 import glob
 

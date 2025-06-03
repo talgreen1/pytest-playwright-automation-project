@@ -1,5 +1,5 @@
 from playwright.sync_api import Page
-from .config import URL
+from config import URL
 import allure
 
 class LoginPage:
