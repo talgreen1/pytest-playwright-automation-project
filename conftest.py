@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import sync_playwright
 import os
 from config import URL
-from test_settings import HEADLESS, TIMEOUT, SLOWMO
+from test_settings import HEADLESS, SLOWMO
 import glob
 import allure
 
@@ -13,13 +13,8 @@ def get_cli_options(request):
         headless_cli = request.config.getoption('--headless')
     except (ValueError, AttributeError):
         headless_cli = None
-    try:
-        slowmo_cli = request.config.getoption('--slowmo')
-    except (ValueError, AttributeError):
-        slowmo_cli = None
     return {
         'headless': headless_cli,
-        'slowmo': slowmo_cli
     }
 
 def get_headless_option(cli_options):
@@ -32,23 +27,6 @@ def get_headless_option(cli_options):
         return headless_env.lower() in ['1', 'true', 'yes']
     return HEADLESS
 
-def get_slowmo_option(cli_options):
-    slowmo_cli = cli_options['slowmo']
-    if slowmo_cli is not None:
-        try:
-            return int(slowmo_cli)
-        except ValueError:
-            pass
-    slowmo_env = os.getenv('SLOWMO')
-    if slowmo_env is not None:
-        try:
-            return int(slowmo_env)
-        except ValueError:
-            pass
-    return SLOWMO
-
-# Removed pytest_addoption to avoid CLI option conflicts
-
 @pytest.fixture(scope="session")
 def playwright_instance():
     with sync_playwright() as p:
@@ -58,8 +36,7 @@ def playwright_instance():
 def browser(playwright_instance, request):
     cli_options = get_cli_options(request)
     headless = get_headless_option(cli_options)
-    slowmo = get_slowmo_option(cli_options)
-    browser = playwright_instance.chromium.launch(headless=headless, slow_mo=slowmo)
+    browser = playwright_instance.chromium.launch(headless=headless)
     yield browser
     browser.close()
 
@@ -89,3 +66,6 @@ def pytest_sessionstart(session):
             os.remove(f)
         except Exception as e:
             print(f"Could not delete {f}: {e}")
+
+def pytest_addoption(parser):
+    parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
