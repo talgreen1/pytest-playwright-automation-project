@@ -10,3 +10,4 @@ venv/
 
 # VSCode settings
 .vscode/
+/.idea/
