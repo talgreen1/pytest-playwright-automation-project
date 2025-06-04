@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from config import URL
 import allure
 
@@ -25,5 +25,5 @@ class LoginPage:
             self.page.click(self.LOGIN_BUTTON)
 
     @allure.step("Check if user is logged in")
-    def is_logged_in(self) -> bool:
-        return self.page.is_visible(self.PRODUCTS_TITLE)
+    def is_logged_in(self) -> None:
+        expect(self.page.locator(self.PRODUCTS_TITLE)).to_be_visible()
