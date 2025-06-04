@@ -3,6 +3,7 @@ from playwright.sync_api import Page
 class ProductsPage:
     FIRST_ADD_TO_CART_BUTTON = "button.btn_primary.btn_inventory"  # First 'Add to cart' button
     CART_BADGE = ".shopping_cart_badge"  # Cart icon badge
+    PRODUCT_ITEM = ".inventory_item"
 
     def __init__(self, page: Page):
         self.page = page
@@ -14,3 +15,6 @@ class ProductsPage:
         if self.page.is_visible(self.CART_BADGE):
             return int(self.page.inner_text(self.CART_BADGE))
         return 0
+
+    def get_product_count(self) -> int:
+        return self.page.locator(self.PRODUCT_ITEM).count()
