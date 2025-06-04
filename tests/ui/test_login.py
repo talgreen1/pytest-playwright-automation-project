@@ -3,6 +3,7 @@ from pages.login_page import LoginPage
 from pages.products_page import ProductsPage
 import allure
 from config import USERNAME, PASSWORD
+from playwright.sync_api import expect
 
 @allure.feature("Login")
 @allure.story("Valid Login")

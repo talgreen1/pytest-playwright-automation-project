@@ -1,7 +1,7 @@
 import pytest
 from pages.login_page import LoginPage
-import allure
 from pages.products_page import ProductsPage
+import allure
 from config import USERNAME, PASSWORD
 
 @allure.feature("Cart")
