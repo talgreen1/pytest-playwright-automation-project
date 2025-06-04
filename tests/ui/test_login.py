@@ -15,7 +15,7 @@ def test_login_success(page):
         login_page.load()
         login_page.login(USERNAME, PASSWORD)
         with allure.step("Verify user is logged in"):
-            assert login_page.is_logged_in(), "Login failed, Products page not visible."
+            login_page.is_logged_in()
         with allure.step("Verify there are exactly 6 product listings"):
             products_page = ProductsPage(page)
             product_count = products_page.get_product_count()

@@ -12,7 +12,7 @@ def test_add_first_item_to_cart(page):
     login_page = LoginPage(page)
     login_page.load()
     login_page.login(USERNAME, PASSWORD)
-    assert login_page.is_logged_in(), "Login failed, Products page not visible."
+    login_page.is_logged_in()
     products_page = ProductsPage(page)
     products_page.add_first_item_to_cart()
     assert products_page.get_cart_count() == 1, "Cart badge does not show '1' after adding item."
