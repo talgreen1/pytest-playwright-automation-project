@@ -4,11 +4,19 @@ import os
 from config import URL
 from test_settings import HEADLESS, TIMEOUT, SLOWMO
 import glob
+import allure
 
 def get_cli_options(request):
     """Return CLI options for headless and slowmo as a dict."""
-    headless_cli = request.config.getoption('--headless')
-    slowmo_cli = request.config.getoption('--slowmo')
+    # Only get CLI options if they exist, otherwise use None
+    try:
+        headless_cli = request.config.getoption('--headless')
+    except (ValueError, AttributeError):
+        headless_cli = None
+    try:
+        slowmo_cli = request.config.getoption('--slowmo')
+    except (ValueError, AttributeError):
+        slowmo_cli = None
     return {
         'headless': headless_cli,
         'slowmo': slowmo_cli
@@ -39,12 +47,7 @@ def get_slowmo_option(cli_options):
             pass
     return SLOWMO
 
-# Use HEADLESS and SLOWMO from test_settings.py as default
-
-def pytest_addoption(parser):
-    parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
-    parser.addoption('--slowmo', action='store', default=None, help='Slow down Playwright operations by the specified ms')
-    # Example for future: parser.addoption('--timeout', action='store', default=None, help='Set browser timeout (ms)')
+# Removed pytest_addoption to avoid CLI option conflicts
 
 @pytest.fixture(scope="session")
 def playwright_instance():
@@ -61,10 +64,20 @@ def browser(playwright_instance, request):
     browser.close()
 
 @pytest.fixture(scope="function")
-def page(browser):
+def page(browser, request):
     context = browser.new_context()
     page = context.new_page()
+    # Start tracing
+    context.tracing.start(screenshots=True, snapshots=True, sources=True)
     yield page
+    # Stop tracing and save
+    trace_path = f"trace_{request.node.name}.zip"
+    context.tracing.stop(path=trace_path)
+    # Attach to Allure
+    if os.path.exists(trace_path):
+        with open(trace_path, "rb") as f:
+            allure.attach(f.read(), name="playwright-trace", attachment_type="application/zip")
+        os.remove(trace_path)
     context.close()
 
 def pytest_sessionstart(session):
