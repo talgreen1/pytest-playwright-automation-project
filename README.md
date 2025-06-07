@@ -83,3 +83,10 @@ pytest-playwright-automation-project/
 ## Example
 
 A single login test for https://www.saucedemo.com/v1/ is implemented in `tests/test_login.py`.
+
+
+TODOS
+# Todo:  
+- capture video
+- move steps definitions to step implementations
+- 
