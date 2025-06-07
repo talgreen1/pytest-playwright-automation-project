@@ -2,16 +2,19 @@ import pytest
 from playwright.sync_api import sync_playwright
 import os
 from config import URL
-from test_settings import HEADLESS, TIMEOUT, SLOWMO
+from test_settings import HEADLESS, SLOWMO
 import glob
+import allure
 
 def get_cli_options(request):
     """Return CLI options for headless and slowmo as a dict."""
-    headless_cli = request.config.getoption('--headless')
-    slowmo_cli = request.config.getoption('--slowmo')
+    # Only get CLI options if they exist, otherwise use None
+    try:
+        headless_cli = request.config.getoption('--headless')
+    except (ValueError, AttributeError):
+        headless_cli = None
     return {
         'headless': headless_cli,
-        'slowmo': slowmo_cli
     }
 
 def get_headless_option(cli_options):
@@ -24,28 +27,6 @@ def get_headless_option(cli_options):
         return headless_env.lower() in ['1', 'true', 'yes']
     return HEADLESS
 
-def get_slowmo_option(cli_options):
-    slowmo_cli = cli_options['slowmo']
-    if slowmo_cli is not None:
-        try:
-            return int(slowmo_cli)
-        except ValueError:
-            pass
-    slowmo_env = os.getenv('SLOWMO')
-    if slowmo_env is not None:
-        try:
-            return int(slowmo_env)
-        except ValueError:
-            pass
-    return SLOWMO
-
-# Use HEADLESS and SLOWMO from test_settings.py as default
-
-def pytest_addoption(parser):
-    parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
-    parser.addoption('--slowmo', action='store', default=None, help='Slow down Playwright operations by the specified ms')
-    # Example for future: parser.addoption('--timeout', action='store', default=None, help='Set browser timeout (ms)')
-
 @pytest.fixture(scope="session")
 def playwright_instance():
     with sync_playwright() as p:
@@ -55,16 +36,25 @@ def playwright_instance():
 def browser(playwright_instance, request):
     cli_options = get_cli_options(request)
     headless = get_headless_option(cli_options)
-    slowmo = get_slowmo_option(cli_options)
-    browser = playwright_instance.chromium.launch(headless=headless, slow_mo=slowmo)
+    browser = playwright_instance.chromium.launch(headless=headless)
     yield browser
     browser.close()
 
 @pytest.fixture(scope="function")
-def page(browser):
+def page(browser, request):
     context = browser.new_context()
     page = context.new_page()
+    # Start tracing
+    context.tracing.start(screenshots=True, snapshots=True, sources=True)
     yield page
+    # Stop tracing and save
+    trace_path = f"trace_{request.node.name}.zip"
+    context.tracing.stop(path=trace_path)
+    # Attach to Allure
+    if os.path.exists(trace_path):
+        with open(trace_path, "rb") as f:
+            allure.attach(f.read(), name="playwright-trace", attachment_type="application/zip")
+        os.remove(trace_path)
     context.close()
 
 def pytest_sessionstart(session):
@@ -76,3 +66,6 @@ def pytest_sessionstart(session):
             os.remove(f)
         except Exception as e:
             print(f"Could not delete {f}: {e}")
+
+def pytest_addoption(parser):
+    parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
