@@ -10,4 +10,10 @@ venv/
 
 # VSCode settings
 .vscode/
+
 /.idea/
+
+
+# Ignore all __pycache__ directories recursively
+__pycache__/
+
