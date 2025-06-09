@@ -10,13 +10,13 @@ from test_params import EXPECTED_PRODUCT_COUNT
 @allure.story("Valid Login")
 @allure.title("Successful login with valid credentials")
 @allure.description("Ensures that logging in with valid credentials displays the Products page and exactly 6 product listings.")
+@allure.label("category", "UI")
 def test_login_success(page):
-    with allure.step("Start login test"):  # Top-level test step
-        login_page = LoginPage(page)
-        login_page.load()
-        login_page.login(USERNAME, PASSWORD)
-        login_page.is_logged_in()
-        with allure.step(f"Verify there are exactly {EXPECTED_PRODUCT_COUNT} product listings"):
-            products_page = ProductsPage(page)
-            product_count = products_page.get_product_count()
-            assert product_count == EXPECTED_PRODUCT_COUNT, f"Expected {EXPECTED_PRODUCT_COUNT} product listings, found {product_count}."
+    login_page = LoginPage(page)
+    login_page.load()
+    login_page.login(USERNAME, PASSWORD)
+    login_page.is_logged_in()
+    with allure.step(f"Verify there are exactly {EXPECTED_PRODUCT_COUNT} product listings"):
+        products_page = ProductsPage(page)
+        product_count = products_page.get_product_count()
+        assert product_count == EXPECTED_PRODUCT_COUNT, f"Expected {EXPECTED_PRODUCT_COUNT} product listings, found {product_count}."
