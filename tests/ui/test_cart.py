@@ -8,6 +8,7 @@ from config import USERNAME, PASSWORD
 @allure.story("Add first item to cart and check cart badge")
 @allure.title("Add first product to cart and verify cart badge")
 @allure.description("This test logs in, adds the first product to the cart, and verifies that the cart badge shows '1'.")
+@allure.label("category", "UI")
 def test_add_first_item_to_cart(page):
     login_page = LoginPage(page)
     login_page.load()

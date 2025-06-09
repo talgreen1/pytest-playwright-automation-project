@@ -22,6 +22,7 @@ def airports_response():
 @allure.story("Airport List")
 @allure.title("Verify airport count is 30")
 @allure.description("Checks that the /airports endpoint returns exactly 30 airports.")
+@allure.label("category", "API")
 def test_airport_count(airports_response):
     with allure.step("Request airport list from /airports endpoint"):
         response = airports_response
@@ -35,6 +36,7 @@ def test_airport_count(airports_response):
 @allure.story("Airport List")
 @allure.title("Verify specific airport is present")
 @allure.description("Checks that a known airport is present in the /airports endpoint response.")
+@allure.label("category", "API")
 @pytest.mark.parametrize("airport_name", [
     "Akureyri Airport",
     "St. Anthony Airport",
@@ -54,6 +56,7 @@ def test_airport_includes_specific(airports_response, airport_name):
 @allure.story("Airport Distance")
 @allure.title("Verify distance between airports is above minimum")
 @allure.description("Checks that the calculated distance between two airports is greater than the specified minimum value.")
+@allure.label("category", "API")
 @pytest.mark.parametrize(
     "from_code,to_code,min_distance",
     [
