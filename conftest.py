@@ -41,21 +41,34 @@ def browser(playwright_instance, request):
     browser.close()
 
 @pytest.fixture(scope="function")
-def page(browser, request):
-    context = browser.new_context()
+def page(browser, request, tmp_path):
+    # Enable video recording in the context
+    context = browser.new_context(
+        record_video_dir=str(tmp_path)
+    )
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IN THE FIXTURE")
+    import pdb; pdb.set_trace()
+    breakpoint()
     page = context.new_page()
     # Start tracing
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
     yield page
     # Stop tracing and save
-    trace_path = f"trace_{request.node.name}.zip"
+    trace_path = str(tmp_path / "trace.zip")
     context.tracing.stop(path=trace_path)
-    # Attach to Allure
-    if os.path.exists(trace_path):
-        with open(trace_path, "rb") as f:
-            allure.attach(f.read(), name="playwright-trace", attachment_type="application/zip")
-        os.remove(trace_path)
+    # Ensure the trace file is flushed to disk before closing context
+    page.close()
     context.close()
+    # Save and attach video and trace to Allure
+    try:
+        video_path = page.video.path()
+        if video_path and os.path.exists(video_path):
+            allure.attach.file(video_path, name="Test Video", attachment_type=allure.attachment_type.MP4)
+        if os.path.exists(trace_path):
+            with open(trace_path, "rb") as f:
+                allure.attach(f.read(), name="Playwright Trace", attachment_type=allure.attachment_type.BINARY)
+    except Exception as e:
+        pass
 
 def pytest_sessionstart(session):
     """Delete all JSON files in allure-results before test session starts."""

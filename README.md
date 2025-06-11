@@ -88,5 +88,5 @@ A single login test for https://www.saucedemo.com/v1/ is implemented in `tests/t
 TODOS
 # Todo:  
 - capture video
-- move steps definitions to step implementations
+- move steps definitions to step implementations - Done
 - 
