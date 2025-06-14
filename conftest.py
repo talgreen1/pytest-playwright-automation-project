@@ -46,7 +46,7 @@ def page(browser, request, tmp_path):
     context = browser.new_context(
         record_video_dir=str(tmp_path)
     )
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IN THE FIXTURE")
+
 
     page = context.new_page()
     # Start tracing
@@ -67,7 +67,8 @@ def page(browser, request, tmp_path):
             with open(trace_path, "rb") as f:
                 allure.attach(f.read(), name="Playwright Trace", attachment_type="application/zip")
     except Exception as e:
-        pass
+        print(f"Error attaching video or trace to Allure: {e}")
+        raise
 
 def pytest_sessionstart(session):
     """Delete all JSON files in allure-results before test session starts."""
