@@ -82,3 +82,19 @@ def pytest_sessionstart(session):
 
 def pytest_addoption(parser):
     parser.addoption('--headless', action='store', default=None, help='Run browser in headless mode (true/false)')
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure and attach to Allure."""
+    outcome = yield
+    rep = outcome.get_result()
+    if rep.when == "call" and rep.failed:
+        page = item.funcargs.get("page")
+        if page:
+            screenshot_path = os.path.join("allure-results", f"{item.name}_failure.png")
+            try:
+                page.screenshot(path=screenshot_path, full_page=True)
+                with open(screenshot_path, "rb") as image_file:
+                    allure.attach(image_file.read(), name="Failure Screenshot", attachment_type=allure.attachment_type.PNG)
+            except Exception as e:
+                print(f"Error capturing screenshot: {e}")
