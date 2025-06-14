@@ -65,7 +65,7 @@ def page(browser, request, tmp_path):
             allure.attach.file(video_path, name="Test Video", attachment_type=allure.attachment_type.MP4)
         if os.path.exists(trace_path):
             with open(trace_path, "rb") as f:
-                allure.attach(f.read(), name="Playwright Trace", attachment_type=allure.attachment_type.BINARY)
+                allure.attach(f.read(), name="Playwright Trace", attachment_type="application/zip")
     except Exception as e:
         pass
 
