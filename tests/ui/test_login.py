@@ -12,7 +12,6 @@ from test_params import EXPECTED_PRODUCT_COUNT
 @allure.description("Ensures that logging in with valid credentials displays the Products page and exactly 6 product listings.")
 @allure.label("category", "UI")
 def test_login_success(page):
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IN THE TEST")
     login_page = LoginPage(page)
     login_page.load()
     login_page.login(USERNAME, PASSWORD)
