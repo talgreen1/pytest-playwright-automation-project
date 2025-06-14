@@ -47,8 +47,7 @@ def page(browser, request, tmp_path):
         record_video_dir=str(tmp_path)
     )
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IN THE FIXTURE")
-    import pdb; pdb.set_trace()
-    breakpoint()
+
     page = context.new_page()
     # Start tracing
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
