@@ -34,6 +34,13 @@ This is a demo automation project for both UI and API testing. It showcases best
      brew install allure
      ```
    - For other OS or manual installation, see https://docs.qameta.io/allure/ for instructions.
+4. **Install Playwright Browsers**
+
+After installing dependencies, run the following command to install the required browsers:
+
+```
+python -m playwright install
+```
 
 ## How to Run Tests
 
@@ -83,6 +90,12 @@ pytest-playwright-automation-project/
 ## Example
 
 A single login test for https://www.saucedemo.com/v1/ is implemented in `tests/test_login.py`.
+
+
+## Playwright Artifacts
+
+- The project is configured to always capture Playwright traces and videos for every test run.
+- Screenshots are automatically captured and attached to the Allure report in case of test failure.
 
 
 TODOS
